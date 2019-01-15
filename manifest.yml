@@ -1,0 +1,13 @@
+---
+applications:
+  - name: spring-cloud-stream-demo-producer
+    path: producer/target/spring-cloud-stream-demo-producer.jar
+    random-route: true
+    services:
+      - rabbitmq
+
+  - name: spring-cloud-stream-demo-consumer
+    path: consumer/target/spring-cloud-stream-demo-consumer.jar
+    random-route: true
+    services:
+      - rabbitmq
