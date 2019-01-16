@@ -24,9 +24,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
 
 @SpringBootApplication
 public class Application {
@@ -46,17 +48,16 @@ class Person {
 @RestController
 @Slf4j
 class PersonController {
-    private Person lastPublishedPerson;
+    private final SseEmitter sseEmitter = new SseEmitter(0L);
 
     @StreamListener(Sink.INPUT)
-    public void onPersonPublished(Person p) {
+    public void onPersonPublished(Person p) throws IOException {
         log.info("Received person: {}", p);
-        lastPublishedPerson = p;
+        sseEmitter.send(p);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> lastPublishedPerson() {
-        return lastPublishedPerson == null ? ResponseEntity.ok("No person published yet") : ResponseEntity.ok(lastPublishedPerson);
+    @GetMapping(value = "/")
+    public SseEmitter streamingPeople() {
+        return sseEmitter;
     }
 }
-
