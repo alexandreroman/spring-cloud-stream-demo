@@ -10,3 +10,6 @@ spring:
       bindings:
         output:
           destination: new-person
+
+server:
+  port: ${PORT:8081}
